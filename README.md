@@ -11,6 +11,10 @@ conda install conda-forge::matplotlib
 conda install conda-forge::pandas
 conda install conda-forge::gunicorn
 conda install conda-forge::numpy
+conda install conda-forge::pyarrow
+conda install conda-forge::dash-bootstrap-components # if using bootstrap
+conda install conda-forge::dash-mantine-components # if using mantine
+
 ```
 
 ## Installation
