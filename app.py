@@ -11,6 +11,9 @@ df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapmi
 external_stylesheets = [dmc.theme.DEFAULT_COLORS]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
+# gunicorn uses this server
+server = app.server
+
 # App layout
 app.layout = dmc.Container([
     dmc.Title('My First App with Data, Graph, and Controls', color="blue", size="h3"),
