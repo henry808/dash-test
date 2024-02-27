@@ -7,9 +7,9 @@ Test to run a dash app.
 ## Prerequisites
 1. anaconda
 2. python
-3. git (github?)
-4. heroku?
-5. 
+3. git cli and github
+4. heroku account
+5. heroku connected to github
 
 # Packages
 ```bash
@@ -25,10 +25,6 @@ conda install conda-forge::dash-mantine-components # if using mantine
 
 ```
 
-## Installation
-```bash
-conda install auto::heroku
-```
 
 ## Usage
 
