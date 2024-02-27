@@ -1,48 +1,75 @@
 # Import packages
-from dash import Dash, html, dash_table, dcc, callback, Output, Input
-import pandas as pd
-import plotly.express as px
-import dash_mantine_components as dmc
+import dash
+# from dash import dcc
+from dash import html
+import dash_bootstrap_components as dbc
+# from dash import Input, Output, State
+# from dash import dash_table 
+# from dash import PreventUpdate
+# import flask
+from flask import Flask
 
-# Incorporate data
-df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminder2007.csv')
 
-# Initialize the app - incorporate a Dash Mantine theme
-external_stylesheets = [dmc.theme.DEFAULT_COLORS]
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+def make_card(alert_message, color, cardbody, style_dict=None):
+    return  html.Div([html.P("  ")    , dbc.Card([dbc.Alert(alert_message, color=color)
+                        ,dbc.CardBody(cardbody)])#end card
+                        ,html.P("  ")
+                        ,html.P("  ")
+                    ])#end div
 
+
+def create_body(items):
+    b = []
+    for item in items:
+        b.append(dbc.Col(make_card(item[0], "primary", item[1])))
+    return b
+
+
+def create_layout():
+    layout = html.Div(style={
+        'background-image': 'url("/assets/YOUR-BACKGROUND.jpg")',
+        'background-position': 'center',
+        }, children = [
+            header
+            , dbc.Container(id = 'card-cont', children = [dbc.Row(create_body(item_lists))], style = {'background-color':'white', })# end container 
+            , footer
+        ] #end children                     
+        ) #end div
+    return layout
+
+
+item_lists = [["root beer" , html.A(id = 'item1', href="item link",   children=[html.Img(src="image link")])],
+            ["root beer" , html.A(id = 'item2', href="item 2 link", children=[html.Img(src="image 2 link")])]
+            ] # end item list
+
+# Initialize the app - incorporate theme
 # gunicorn uses this server
-server = app.server
+server = Flask(__name__)
+external_stylesheets=[dbc.themes.BOOTSTRAP]
+app = dash.Dash(__name__,server = server ,meta_tags=[{ "content": "width=device-width"}], external_stylesheets=external_stylesheets)
+app.config.suppress_callback_exceptions = True
 
 # App layout
-app.layout = dmc.Container([
-    dmc.Title('My First App with Data, Graph, and Controls', color="blue", size="h3"),
-    dmc.RadioGroup(
-            [dmc.Radio(i, value=i) for i in  ['pop', 'lifeExp', 'gdpPercap']],
-            id='my-dmc-radio-item',
-            value='lifeExp',
-            size="sm"
-        ),
-    dmc.Grid([
-        dmc.Col([
-            dash_table.DataTable(data=df.to_dict('records'), page_size=12, style_table={'overflowX': 'auto'})
-        ], span=6),
-        dmc.Col([
-            dcc.Graph(figure={}, id='graph-placeholder')
-        ], span=6),
-    ]),
+header = html.Div(dbc.Container([
+            html.H1("RootbeerReport.com", className="display-3"),
+            html.P("Find root beer reviews at RootbeerReport.com."),
+            html.Hr(className="my-2"),
+            html.P(" " " "),
+            html.P(" ")
+        ],  fluid=True, className="py-3",), className="p-3 bg-light rounded-3") # end container
+footer = html.Div(dbc.Container([
+        html.H1("RootbeerReport.com"),
+        html.P(''),
+        html.P("123 Fake ST NE", style= {'text-align': 'center'}),
+        html.P("MN 55445", style= {'text-align': 'center'}),
+        html.Hr(className="my-2"),
+        html.P(''),
+        html.P('Copyright © 2024 RootbeerReport - All Rights Reserved.')
+    ],fluid=True, className="py-3"), className="p-3 bg-light rounded-3")  # end container
 
-], fluid=True)
 
-# Add controls to build the interaction
-@callback(
-    Output(component_id='graph-placeholder', component_property='figure'),
-    Input(component_id='my-dmc-radio-item', component_property='value')
-)
-def update_graph(col_chosen):
-    fig = px.histogram(df, x='continent', y=col_chosen, histfunc='avg')
-    return fig
+app.layout = create_layout()
 
-# Run the App
+# main
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run_server(debug=True)
